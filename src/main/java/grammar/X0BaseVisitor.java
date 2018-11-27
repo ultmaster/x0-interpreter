@@ -66,6 +66,13 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitTypeStr(X0Parser.TypeStrContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitVarElementary(X0Parser.VarElementaryContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -214,4 +221,11 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitLiteralInteger(X0Parser.LiteralIntegerContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitLiteralString(X0Parser.LiteralStringContext ctx) { return visitChildren(ctx); }
 }

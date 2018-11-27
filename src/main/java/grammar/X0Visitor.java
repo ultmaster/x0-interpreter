@@ -57,6 +57,13 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTypeChar(X0Parser.TypeCharContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code typeStr}
+	 * labeled alternative in {@link X0Parser#type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeStr(X0Parser.TypeStrContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code varElementary}
 	 * labeled alternative in {@link X0Parser#var}.
 	 * @param ctx the parse tree
@@ -200,4 +207,11 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitLiteralInteger(X0Parser.LiteralIntegerContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code literalString}
+	 * labeled alternative in {@link X0Parser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralString(X0Parser.LiteralStringContext ctx);
 }

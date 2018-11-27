@@ -1,9 +1,6 @@
 package core;
 
-import core.data.DataType;
-import core.data.X0Integer;
-import core.data.ElementaryType;
-import core.data.X0Number;
+import core.data.*;
 import grammar.X0BaseVisitor;
 import grammar.X0Parser;
 
@@ -40,6 +37,11 @@ public class Action extends X0BaseVisitor {
     @Override
     public Integer visitTypeChar(X0Parser.TypeCharContext ctx) {
         return X0Parser.CHAR;
+    }
+
+    @Override
+    public Integer visitTypeStr(X0Parser.TypeStrContext ctx) {
+        return X0Parser.STR;
     }
 
     @Override
@@ -180,5 +182,11 @@ public class Action extends X0BaseVisitor {
     @Override
     public X0Integer visitLiteralInteger(X0Parser.LiteralIntegerContext ctx) {
         return new X0Integer(Long.parseLong(ctx.getText()));
+    }
+
+    @Override
+    public X0String visitLiteralString(X0Parser.LiteralStringContext ctx) {
+        String r = ctx.STRING().getText();
+        return new X0String(r.substring(1, r.length() - 1));
     }
 }

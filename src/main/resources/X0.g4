@@ -20,6 +20,7 @@ ident
 type
     : INT                       # typeInt
     | CHAR                      # typeChar
+    | STR                       # typeStr
     ;
 
 var
@@ -96,13 +97,15 @@ factor
     ;
 
 literal
-    : NUM                       # literalInteger
+    : NUM                          # literalInteger
+    | STRING                       # literalString
     ;
 
 
 COMMENT: '/*' .*? '*/' -> skip;
 INT: 'int';
 CHAR: 'char';
+STR: 'str';
 ID_STRING: [a-zA-Z][a-zA-Z0-9]* ;
 NUM: [0-9]+;
 PLUS: '+';
@@ -115,5 +118,7 @@ LT: '<';
 LEQ: '<=';
 EQ: '==';
 NEQ: '!=';
-
+STRING: '"' ~["\\\r\n]*? '"';
 WS: [ \t\r\n] -> skip;
+
+

@@ -5,5 +5,5 @@ main {
     read a;
     read b;
     c = a + b;
-    write c;
+    write "answer is " + c;
 }

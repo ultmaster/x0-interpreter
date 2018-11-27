@@ -22,7 +22,5 @@ public class Main {
         X0Parser.ProgramContext tree = parser.program();
         X0Visitor visitor = new Action(parser);
         visitor.visit(tree);
-
-        System.out.println("done");
     }
 }

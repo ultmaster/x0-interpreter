@@ -35,6 +35,10 @@ public class X0String extends ElementaryType {
         return new X0String(val + that.toString());
     }
 
+    ElementaryType _add_reverse(ElementaryType that) {
+        return new X0String(that.toString() + val);
+    }
+
     @Override
     public ElementaryType subtract(ElementaryType that) {
         throw new RuntimeException("String does not support subtraction.");

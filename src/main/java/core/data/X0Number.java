@@ -11,6 +11,8 @@ public abstract class X0Number extends ElementaryType {
     abstract protected X0Number _multiply(X0Number that);
     abstract protected X0Number _divide(X0Number that);
     abstract protected X0Number _divide_reverse(X0Number that);
+    abstract protected X0Number _mod(X0Number that);
+    abstract protected X0Number _mod_reverse(X0Number that);
 
     @Override
     public void assign(ElementaryType that) {
@@ -31,7 +33,7 @@ public abstract class X0Number extends ElementaryType {
 
     public ElementaryType add(ElementaryType that) {
         if (that instanceof X0String) {
-            return that.add(this);
+            return ((X0String) that)._add_reverse(this);
         } else {
             return this.add((X0Number) that);
         }
@@ -39,13 +41,13 @@ public abstract class X0Number extends ElementaryType {
 
     public ElementaryType subtract(ElementaryType that) {
         if (that instanceof X0Number) {
-            return that.subtract((X0Number) this);
+            return this.subtract((X0Number) that);
         } else {
             throw new RuntimeException("Subtraction between non-numbers is not allowed.");
         }
     }
 
-    public X0Number add(X0Number that) {
+    private X0Number add(X0Number that) {
         if (this.getCastPriority() >= that.getCastPriority()) {
             return this._add(that);
         } else {
@@ -53,7 +55,7 @@ public abstract class X0Number extends ElementaryType {
         }
     }
 
-    public X0Number subtract(X0Number that) {
+    private X0Number subtract(X0Number that) {
         if (this.getCastPriority() >= that.getCastPriority()) {
             return this._subtract(that);
         } else {
@@ -74,6 +76,14 @@ public abstract class X0Number extends ElementaryType {
             return this._divide(that);
         } else {
             return that._divide_reverse(this);
+        }
+    }
+
+    public X0Number mod(X0Number that) {
+        if (this.getCastPriority() >= that.getCastPriority()) {
+            return this._mod(that);
+        } else {
+            return that._mod_reverse(this);
         }
     }
 

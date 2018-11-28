@@ -59,4 +59,11 @@ public class X0Float extends X0Number {
         return new X0Float(that.getVal().doubleValue() / this.getVal());
     }
 
+    protected X0Number _mod(X0Number that) {
+        throw new RuntimeException("Mod operation not supported for float type.");
+    }
+
+    protected X0Number _mod_reverse(X0Number that) {
+        return _mod(that);
+    }
 }

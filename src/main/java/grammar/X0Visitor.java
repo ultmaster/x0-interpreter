@@ -102,6 +102,12 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitWhileStat(X0Parser.WhileStatContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link X0Parser#forStat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForStat(X0Parser.ForStatContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link X0Parser#writeStat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

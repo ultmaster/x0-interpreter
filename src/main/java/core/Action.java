@@ -4,6 +4,7 @@ import core.data.*;
 import grammar.X0BaseVisitor;
 import grammar.X0Parser;
 
+import javax.xml.bind.Element;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -114,17 +115,19 @@ public class Action extends X0BaseVisitor {
     }
 
     @Override
-    public Boolean visitRelationExpr(X0Parser.RelationExprContext ctx) {
+    public X0Integer visitRelationExpr(X0Parser.RelationExprContext ctx) {
         ElementaryType a = (ElementaryType) visit(ctx.additiveExpr(0));
         ElementaryType b = (ElementaryType) visit(ctx.additiveExpr(1));
         int compareResult = a.compare(b);
-        if (ctx.op.getType() == X0Parser.GT) return compareResult > 0;
-        if (ctx.op.getType() == X0Parser.GEQ) return compareResult >= 0;
-        if (ctx.op.getType() == X0Parser.LT) return compareResult < 0;
-        if (ctx.op.getType() == X0Parser.LEQ) return compareResult <= 0;
-        if (ctx.op.getType() == X0Parser.EQ) return compareResult == 0;
-        if (ctx.op.getType() == X0Parser.NEQ) return compareResult != 0;
-        return null;
+        boolean result = false;
+        if (ctx.op.getType() == X0Parser.GT) result = compareResult > 0;
+        else if (ctx.op.getType() == X0Parser.GEQ) result = compareResult >= 0;
+        else if (ctx.op.getType() == X0Parser.LT) result = compareResult < 0;
+        else if (ctx.op.getType() == X0Parser.LEQ) result = compareResult <= 0;
+        else if (ctx.op.getType() == X0Parser.EQ) result = compareResult == 0;
+        else if (ctx.op.getType() == X0Parser.NEQ) result = compareResult != 0;
+        if (result) return new X0Integer(1);
+        else return new X0Integer(0);
     }
 
     @Override
@@ -160,6 +163,8 @@ public class Action extends X0BaseVisitor {
             return a.multiply(b);
         } else if (ctx.op.getType() == X0Parser.DIV) {
             return a.divide(b);
+        } else if (ctx.op.getType() == X0Parser.MOD) {
+            return a.mod(b);
         }
         return null;
     }
@@ -188,5 +193,40 @@ public class Action extends X0BaseVisitor {
     public X0String visitLiteralString(X0Parser.LiteralStringContext ctx) {
         String r = ctx.STRING().getText();
         return new X0String(r.substring(1, r.length() - 1));
+    }
+
+    @Override
+    public Object visitIfStat(X0Parser.IfStatContext ctx) {
+        ElementaryType cond = (ElementaryType) visit(ctx.expression());
+        if (cond.compareToZero() != 0) {
+            visit(ctx.statement(0));
+        } else if (ctx.statement().size() > 1) {
+            visit(ctx.statement(1));
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitWhileStat(X0Parser.WhileStatContext ctx) {
+        while (true) {
+            ElementaryType cond = (ElementaryType) visit(ctx.expression());
+            if (cond.compareToZero() != 0)
+                visit(ctx.statement());
+            else break;
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitForStat(X0Parser.ForStatContext ctx) {
+        visit(ctx.expression(0));
+        while (true) {
+            ElementaryType cond = (ElementaryType) visit(ctx.expression(1));
+            if (cond.compareToZero() != 0) {
+                visit(ctx.statement());
+                visit(ctx.expression(2));
+            } else break;
+        }
+        return null;
     }
 }

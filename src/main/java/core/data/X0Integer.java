@@ -60,4 +60,12 @@ public class X0Integer extends X0Number {
         return new X0Integer(that.getVal().longValue() / this.getVal());
     }
 
+    protected X0Number _mod(X0Number that) {
+        return new X0Integer(this.getVal() % that.getVal().longValue());
+    }
+
+    protected X0Number _mod_reverse(X0Number that) {
+        return new X0Integer(that.getVal().longValue() % this.getVal());
+    }
+
 }

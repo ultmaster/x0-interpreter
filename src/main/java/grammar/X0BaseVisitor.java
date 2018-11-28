@@ -115,6 +115,13 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitForStat(X0Parser.ForStatContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitWriteStat(X0Parser.WriteStatContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

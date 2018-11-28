@@ -39,15 +39,19 @@ statement
     | writeStat
     | compoundStat
     | expressionStat
+    | forStat
     ;
 
 ifStat
-    : 'if' '(' expression ')' statement
-    | 'if' '(' expression ')' statement 'else' statement
+    : 'if' '(' expression ')' statement ('else' statement)?
     ;
 
 whileStat
     : 'while' '(' expression ')' statement
+    ;
+
+forStat
+    : 'for' '(' expression ';' expression ';' expression ')' statement
     ;
 
 writeStat
@@ -86,7 +90,7 @@ additiveExpr
     ;
 
 term
-    : term op = (MUL | DIV) factor               # termRecursive
+    : term op = (MUL | DIV | MOD) factor               # termRecursive
     | factor                                     # termDefault
     ;
 
@@ -112,6 +116,7 @@ PLUS: '+';
 MINUS: '-';
 MUL: '*';
 DIV: '/';
+MOD: '%';
 GT: '>';
 GEQ: '>=';
 LT: '<';

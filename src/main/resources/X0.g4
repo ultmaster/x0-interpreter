@@ -42,7 +42,12 @@ statement
     | compoundStat
     | expressionStat
     | forStat
+    | continueStat
+    | breakStat
     ;
+
+continueStat: CONTINUE;
+breakStat: BREAK;
 
 ifStat
     : 'if' '(' expression ')' statement ('else' statement)?
@@ -133,6 +138,11 @@ FLOAT: 'float';
 BOOL: 'bool';
 TRUE: 'true';
 FALSE: 'false';
+CONTINUE: 'continue';
+BREAK: 'break';
+AND: 'and';
+OR: 'or';
+NOT: 'not';
 ID_STRING: [a-zA-Z][a-zA-Z0-9]* ;
 NUM: [0-9]+;
 PLUS: '+';
@@ -146,8 +156,5 @@ LT: '<';
 LEQ: '<=';
 EQ: '==';
 NEQ: '!=';
-AND: 'and';
-OR: 'or';
-NOT: 'not';
 STRING: '"' ~["\\\r\n]*? '"';
 WS: [ \t\r\n] -> skip;

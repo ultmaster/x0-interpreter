@@ -10,11 +10,13 @@ public class Action extends X0BaseVisitor {
     private X0Parser parser;
     private Scanner cin;
     private Stack<Map<String, DataType>> dataStack;
+    private int loopControlFlag, exitFlag;
 
     public Action(X0Parser parser) {
         this.parser = parser;
         cin = new Scanner(System.in);
         dataStack = new Stack<>();
+        loopControlFlag = exitFlag = 0;
     }
 
     @Override
@@ -292,13 +294,29 @@ public class Action extends X0BaseVisitor {
         return null;
     }
 
+    private boolean testBreak() {
+        if (loopControlFlag == X0Parser.BREAK) {
+            loopControlFlag = 0;
+            return true;
+        } return false;
+    }
+
+    private boolean testContinue() {
+        if (loopControlFlag == X0Parser.CONTINUE) {
+            loopControlFlag = 0;
+            return true;
+        } return false;
+    }
+
     @Override
     public Object visitWhileStat(X0Parser.WhileStatContext ctx) {
         while (true) {
             ElementaryType cond = (ElementaryType) visit(ctx.expression());
-            if (cond.compareToZero() != 0)
+            if (cond.compareToZero() != 0) {
                 visit(ctx.statement());
-            else break;
+                if (testBreak()) break;
+                testContinue();
+            } else break;
         }
         return null;
     }
@@ -310,6 +328,8 @@ public class Action extends X0BaseVisitor {
             ElementaryType cond = (ElementaryType) visit(ctx.expression(1));
             if (cond.compareToZero() != 0) {
                 visit(ctx.statement());
+                if (testBreak()) break;
+                testContinue();
                 visit(ctx.expression(2));
             } else break;
         }
@@ -328,5 +348,27 @@ public class Action extends X0BaseVisitor {
         ElementaryType data = (ElementaryType) visit(ctx.var());
         data.assign(data.add(new X0Integer(1)));
         return data;
+    }
+
+    @Override
+    public Object visitContinueStat(X0Parser.ContinueStatContext ctx) {
+        loopControlFlag = X0Parser.CONTINUE;
+        return null;
+    }
+
+    @Override
+    public Object visitBreakStat(X0Parser.BreakStatContext ctx) {
+        loopControlFlag = X0Parser.BREAK;
+        return null;
+    }
+
+    @Override
+    public Object visitStatementList(X0Parser.StatementListContext ctx) {
+        for (X0Parser.StatementContext statCtx: ctx.statement()) {
+            visit(statCtx);
+            if (loopControlFlag != 0)
+                return null;
+        }
+        return null;
     }
 }

@@ -104,6 +104,18 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStatement(X0Parser.StatementContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link X0Parser#continueStat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitContinueStat(X0Parser.ContinueStatContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#breakStat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBreakStat(X0Parser.BreakStatContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link X0Parser#ifStat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

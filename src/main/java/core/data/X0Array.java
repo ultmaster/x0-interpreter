@@ -4,7 +4,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 public class X0Array<T extends ElementaryType> extends DataType {
-    private ElementaryType[] data;
+    private T[] data;
     private List<Integer> dimensions;
 
     @SuppressWarnings("unchecked")
@@ -12,6 +12,13 @@ public class X0Array<T extends ElementaryType> extends DataType {
         this.dimensions = dimensions;
         int capacity = 1;
         for (int dimension : this.dimensions) capacity *= dimension;
+        data = (T[]) Array.newInstance(clazz, capacity);
+        for (int i = 0; i < capacity; ++i)
+            try {
+                data[i] = clazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
     }
 
     private int getRealIndex(List<Integer> idx) {
@@ -25,6 +32,6 @@ public class X0Array<T extends ElementaryType> extends DataType {
     }
 
     public T get(List<Integer> idx) {
-        return (T) data[getRealIndex(idx)];
+        return data[getRealIndex(idx)];
     }
 }

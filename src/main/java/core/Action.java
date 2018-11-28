@@ -318,14 +318,14 @@ public class Action extends X0BaseVisitor {
 
     @Override
     public Object visitExprSelfDecrease(X0Parser.ExprSelfDecreaseContext ctx) {
-        ElementaryType data = (ElementaryType) visit(ctx);
+        ElementaryType data = (ElementaryType) visit(ctx.var());
         data.assign(data.subtract(new X0Integer(1)));
         return data;
     }
 
     @Override
     public ElementaryType visitExprSelfIncrease(X0Parser.ExprSelfIncreaseContext ctx) {
-        ElementaryType data = (ElementaryType) visit(ctx);
+        ElementaryType data = (ElementaryType) visit(ctx.var());
         data.assign(data.add(new X0Integer(1)));
         return data;
     }

@@ -64,6 +64,20 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTypeStr(X0Parser.TypeStrContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code typeFloat}
+	 * labeled alternative in {@link X0Parser#type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeFloat(X0Parser.TypeFloatContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code typeBool}
+	 * labeled alternative in {@link X0Parser#type}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeBool(X0Parser.TypeBoolContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code varElementary}
 	 * labeled alternative in {@link X0Parser#var}.
 	 * @param ctx the parse tree
@@ -139,6 +153,20 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExprAssign(X0Parser.ExprAssignContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code exprSelfIncrease}
+	 * labeled alternative in {@link X0Parser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprSelfIncrease(X0Parser.ExprSelfIncreaseContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code exprSelfDecrease}
+	 * labeled alternative in {@link X0Parser#expression}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExprSelfDecrease(X0Parser.ExprSelfDecreaseContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code exprSimpleWrapper}
 	 * labeled alternative in {@link X0Parser#expression}.
 	 * @param ctx the parse tree
@@ -146,17 +174,39 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExprSimpleWrapper(X0Parser.ExprSimpleWrapperContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link X0Parser#simpleExpr}.
+	 * Visit a parse tree produced by the {@code conditionExprSimple}
+	 * labeled alternative in {@link X0Parser#simpleExpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSimpleExpr(X0Parser.SimpleExprContext ctx);
+	T visitConditionExprSimple(X0Parser.ConditionExprSimpleContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link X0Parser#relationExpr}.
+	 * Visit a parse tree produced by the {@code conditionExprRecursive}
+	 * labeled alternative in {@link X0Parser#simpleExpr}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRelationExpr(X0Parser.RelationExprContext ctx);
+	T visitConditionExprRecursive(X0Parser.ConditionExprRecursiveContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code conditionTermNot}
+	 * labeled alternative in {@link X0Parser#conditionTerm}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditionTermNot(X0Parser.ConditionTermNotContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code conditionTermRecursive}
+	 * labeled alternative in {@link X0Parser#conditionTerm}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditionTermRecursive(X0Parser.ConditionTermRecursiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#conditionFactor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditionFactor(X0Parser.ConditionFactorContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code additiveExprRecursive}
 	 * labeled alternative in {@link X0Parser#additiveExpr}.
@@ -220,4 +270,18 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitLiteralString(X0Parser.LiteralStringContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code literalBool}
+	 * labeled alternative in {@link X0Parser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralBool(X0Parser.LiteralBoolContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code literalFloat}
+	 * labeled alternative in {@link X0Parser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteralFloat(X0Parser.LiteralFloatContext ctx);
 }

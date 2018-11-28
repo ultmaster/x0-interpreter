@@ -4,11 +4,7 @@ import core.data.*;
 import grammar.X0BaseVisitor;
 import grammar.X0Parser;
 
-import javax.xml.bind.Element;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 
 public class Action extends X0BaseVisitor {
     private X0Parser parser;
@@ -46,6 +42,16 @@ public class Action extends X0BaseVisitor {
     }
 
     @Override
+    public Integer visitTypeFloat(X0Parser.TypeFloatContext ctx) {
+        return X0Parser.FLOAT;
+    }
+
+    @Override
+    public Integer visitTypeBool(X0Parser.TypeBoolContext ctx) {
+        return X0Parser.BOOL;
+    }
+
+    @Override
     public String visitIdent(X0Parser.IdentContext ctx) {
         return ctx.getText();
     }
@@ -61,12 +67,20 @@ public class Action extends X0BaseVisitor {
     }
 
     @Override
-    public DataType visitDeclElementary(X0Parser.DeclElementaryContext ctx) {
+    public Object visitDeclArray(X0Parser.DeclArrayContext ctx) {
         int type = (Integer) this.visit(ctx.type());
         String name = (String) this.visit(ctx.ident());
         DataType data = null;
+        ArrayList<Integer> dimensions = new ArrayList<>();
+        ctx.NUM().forEach(num -> dimensions.add(Integer.parseInt(num.getSymbol().getText())));
         if (type == X0Parser.INT || type == X0Parser.CHAR) {
-            data = new X0Integer();
+            data = new X0Array<>(X0Integer.class, dimensions);
+        } else if (type == X0Parser.BOOL) {
+            data = new X0Array<>(X0Boolean.class, dimensions);
+        } else if (type == X0Parser.FLOAT) {
+            data = new X0Array<>(X0Float.class, dimensions);
+        } else if (type == X0Parser.STR) {
+            data = new X0Array<>(X0String.class, dimensions);
         }
         assert data != null;
         data.setIdent(name);
@@ -74,9 +88,43 @@ public class Action extends X0BaseVisitor {
     }
 
     @Override
+    public DataType visitDeclElementary(X0Parser.DeclElementaryContext ctx) {
+        int type = (Integer) this.visit(ctx.type());
+        String name = (String) this.visit(ctx.ident());
+        DataType data = null;
+        if (type == X0Parser.INT || type == X0Parser.CHAR) {
+            data = new X0Integer();
+        } else if (type == X0Parser.BOOL) {
+            data = new X0Boolean();
+        } else if (type == X0Parser.FLOAT) {
+            data = new X0Float();
+        } else if (type == X0Parser.STR) {
+            data = new X0String();
+        }
+        assert data != null;
+        data.setIdent(name);
+        return data;
+    }
+
+    @Override
+    public ElementaryType visitVarArray(X0Parser.VarArrayContext ctx) {
+        String ident = this.visitIdent(ctx.ident());
+        DataType data = dataStack.peek().get(ident);
+        if (data == null || ! (data instanceof X0Array)) {
+            throw new RuntimeException("Unable to find '" + ident + "' as an elementary type variable");
+        }
+        List<Integer> indices = new ArrayList<>();
+        ctx.expression().forEach(num -> {
+            X0Integer t = (X0Integer) this.visit(num);
+            indices.add(t.getVal().intValue());
+        });
+        return ((X0Array) data).get(indices);
+    }
+
+    @Override
     public ElementaryType visitVarElementary(X0Parser.VarElementaryContext ctx) {
         String ident = this.visitIdent(ctx.ident());
-        DataType data = (DataType) dataStack.peek().get(ident);
+        DataType data = dataStack.peek().get(ident);
         if (data == null || ! (data instanceof ElementaryType)) {
             throw new RuntimeException("Unable to find '" + ident + "' as an elementary type variable");
         }
@@ -93,7 +141,13 @@ public class Action extends X0BaseVisitor {
     public Object visitReadStat(X0Parser.ReadStatContext ctx) {
         ElementaryType data = (ElementaryType) this.visit(ctx.var());
         if (data instanceof X0Integer) {
-            ((X0Integer) data).assign(new X0Integer(cin.nextLong()));
+            data.assign(new X0Integer(cin.nextLong()));
+        } else if (data instanceof X0Boolean) {
+            data.assign(new X0Boolean(cin.nextInt()));
+        } else if (data instanceof X0Float) {
+            data.assign(new X0Float(cin.nextDouble()));
+        } else if (data instanceof X0String) {
+            data.assign(new X0String(cin.next()));
         } else {
             System.err.println("Read failed");
         }
@@ -115,19 +169,41 @@ public class Action extends X0BaseVisitor {
     }
 
     @Override
-    public X0Integer visitRelationExpr(X0Parser.RelationExprContext ctx) {
+    public ElementaryType visitConditionFactor(X0Parser.ConditionFactorContext ctx) {
         ElementaryType a = (ElementaryType) visit(ctx.additiveExpr(0));
-        ElementaryType b = (ElementaryType) visit(ctx.additiveExpr(1));
-        int compareResult = a.compare(b);
-        boolean result = false;
-        if (ctx.op.getType() == X0Parser.GT) result = compareResult > 0;
-        else if (ctx.op.getType() == X0Parser.GEQ) result = compareResult >= 0;
-        else if (ctx.op.getType() == X0Parser.LT) result = compareResult < 0;
-        else if (ctx.op.getType() == X0Parser.LEQ) result = compareResult <= 0;
-        else if (ctx.op.getType() == X0Parser.EQ) result = compareResult == 0;
-        else if (ctx.op.getType() == X0Parser.NEQ) result = compareResult != 0;
-        if (result) return new X0Integer(1);
-        else return new X0Integer(0);
+        if (ctx.additiveExpr().size() > 1) {
+            ElementaryType b = (ElementaryType) visit(ctx.additiveExpr(1));
+            int compareResult = a.compare(b);
+            boolean result = false;
+            if (ctx.op.getType() == X0Parser.GT) result = compareResult > 0;
+            else if (ctx.op.getType() == X0Parser.GEQ) result = compareResult >= 0;
+            else if (ctx.op.getType() == X0Parser.LT) result = compareResult < 0;
+            else if (ctx.op.getType() == X0Parser.LEQ) result = compareResult <= 0;
+            else if (ctx.op.getType() == X0Parser.EQ) result = compareResult == 0;
+            else if (ctx.op.getType() == X0Parser.NEQ) result = compareResult != 0;
+            return new X0Boolean(result);
+        } else return a;
+    }
+
+    @Override
+    public ElementaryType visitConditionExprRecursive(X0Parser.ConditionExprRecursiveContext ctx) {
+        ElementaryType a = (ElementaryType) visit(ctx.simpleExpr());
+        ElementaryType b = (ElementaryType) visit(ctx.conditionTerm());
+        return a.or(b);
+    }
+
+    @Override
+    public ElementaryType visitConditionTermNot(X0Parser.ConditionTermNotContext ctx) {
+        ElementaryType ret = (ElementaryType) visit(ctx.conditionFactor());
+        if (ctx.NOT() != null) return ret.not();
+        else return ret;
+    }
+
+    @Override
+    public ElementaryType visitConditionTermRecursive(X0Parser.ConditionTermRecursiveContext ctx) {
+        ElementaryType a = (ElementaryType) visit(ctx.conditionTerm());
+        ElementaryType b = (ElementaryType) visit(ctx.conditionFactor());
+        return a.and(b);
     }
 
     @Override
@@ -196,6 +272,16 @@ public class Action extends X0BaseVisitor {
     }
 
     @Override
+    public X0Boolean visitLiteralBool(X0Parser.LiteralBoolContext ctx) {
+        return new X0Boolean(ctx.getText().equals("true"));
+    }
+
+    @Override
+    public X0Float visitLiteralFloat(X0Parser.LiteralFloatContext ctx) {
+        return new X0Float(Double.parseDouble(ctx.getText()));
+    }
+
+    @Override
     public Object visitIfStat(X0Parser.IfStatContext ctx) {
         ElementaryType cond = (ElementaryType) visit(ctx.expression());
         if (cond.compareToZero() != 0) {
@@ -228,5 +314,19 @@ public class Action extends X0BaseVisitor {
             } else break;
         }
         return null;
+    }
+
+    @Override
+    public Object visitExprSelfDecrease(X0Parser.ExprSelfDecreaseContext ctx) {
+        ElementaryType data = (ElementaryType) visit(ctx);
+        data.assign(data.subtract(new X0Integer(1)));
+        return data;
+    }
+
+    @Override
+    public ElementaryType visitExprSelfIncrease(X0Parser.ExprSelfIncreaseContext ctx) {
+        ElementaryType data = (ElementaryType) visit(ctx);
+        data.assign(data.add(new X0Integer(1)));
+        return data;
     }
 }

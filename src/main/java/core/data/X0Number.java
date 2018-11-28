@@ -16,7 +16,7 @@ public abstract class X0Number extends ElementaryType {
 
     @Override
     public void assign(ElementaryType that) {
-        if (!(that instanceof X0Number)) {
+        if (!(that instanceof X0Number) && !(this instanceof X0Boolean)) {
             throw new RuntimeException("Cannot cast a string into a number.");
         }
         super.assign(that);

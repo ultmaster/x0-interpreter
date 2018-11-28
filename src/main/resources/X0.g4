@@ -9,8 +9,8 @@ declarationList
     ;
 
 declarationStat
-    : type ident ';'               # declElementary
-    | type ident '[' NUM ']' ';'   # declArray
+    : type ident ';'                                # declElementary
+    | type ident '[' NUM (']' '[' NUM)* ']' ';'     # declArray
     ;
 
 ident
@@ -21,11 +21,13 @@ type
     : INT                       # typeInt
     | CHAR                      # typeChar
     | STR                       # typeStr
+    | FLOAT                     # typeFloat
+    | BOOL                      # typeBool
     ;
 
 var
-    : ident                        # varElementary
-    | ident '[' expression ']'     # varArray
+    : ident                                                 # varElementary
+    | ident '[' expression (']' '[' expression )* ']'       # varArray
     ;
 
 statementList
@@ -72,16 +74,24 @@ expressionStat
 
 expression
     : var '=' expression        # exprAssign
+    | '++' var                  # exprSelfIncrease
+    | '--' var                  # exprSelfDecrease
     | simpleExpr                # exprSimpleWrapper
     ;
 
 simpleExpr
-    : additiveExpr
-    | relationExpr
+    : simpleExpr OR conditionTerm                 # conditionExprRecursive
+    | conditionTerm                               # conditionExprSimple
     ;
 
-relationExpr
+conditionTerm
+    : conditionTerm AND conditionFactor           # conditionTermRecursive
+    | NOT? conditionFactor                        # conditionTermNot
+    ;
+
+conditionFactor
     : additiveExpr op = (GT | GEQ | LT | LEQ | EQ | NEQ) additiveExpr
+    | additiveExpr
     ;
 
 additiveExpr
@@ -90,7 +100,7 @@ additiveExpr
     ;
 
 term
-    : term op = (MUL | DIV | MOD) factor               # termRecursive
+    : term op = (MUL | DIV | MOD) factor         # termRecursive
     | factor                                     # termDefault
     ;
 
@@ -101,15 +111,28 @@ factor
     ;
 
 literal
-    : NUM                          # literalInteger
-    | STRING                       # literalString
+    : (PLUS | MINUS)? NUM                           # literalInteger
+    | STRING                                        # literalString
+    | (TRUE | FALSE)                                # literalBool
+    | (PLUS | MINUS)? DecimalFloatingPointLiteral   # literalFloat
     ;
 
+DecimalFloatingPointLiteral
+    : NUM '.' NUM? ExponentPart?
+    | '.' NUM ExponentPart?
+    | NUM ExponentPart
+    ;
+
+fragment ExponentPart: [eE] (PLUS | MINUS)? NUM;
 
 COMMENT: '/*' .*? '*/' -> skip;
 INT: 'int';
 CHAR: 'char';
 STR: 'str';
+FLOAT: 'float';
+BOOL: 'bool';
+TRUE: 'true';
+FALSE: 'false';
 ID_STRING: [a-zA-Z][a-zA-Z0-9]* ;
 NUM: [0-9]+;
 PLUS: '+';
@@ -123,7 +146,8 @@ LT: '<';
 LEQ: '<=';
 EQ: '==';
 NEQ: '!=';
+AND: 'and';
+OR: 'or';
+NOT: 'not';
 STRING: '"' ~["\\\r\n]*? '"';
 WS: [ \t\r\n] -> skip;
-
-

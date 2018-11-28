@@ -11,4 +11,16 @@ public abstract class ElementaryType extends DataType {
     abstract public ElementaryType negative();
     abstract public int compare(ElementaryType that);
     abstract public int compareToZero();
+
+    public X0Boolean and(ElementaryType that) {
+        return new X0Boolean(this.compareToZero() != 0 && that.compareToZero() != 0);
+    }
+
+    public X0Boolean or(ElementaryType that) {
+        return new X0Boolean(this.compareToZero() != 0 || that.compareToZero() != 0);
+    }
+
+    public X0Boolean not() {
+        return new X0Boolean(this.compareToZero() == 0);
+    }
 }

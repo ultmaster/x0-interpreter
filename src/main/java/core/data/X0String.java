@@ -67,7 +67,7 @@ public class X0String extends ElementaryType {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public X0String clone() {
         return new X0String(this.getVal());
     }
 }

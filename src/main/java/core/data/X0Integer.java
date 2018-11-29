@@ -74,7 +74,7 @@ public class X0Integer extends X0Number {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public X0Integer clone() {
         return new X0Integer(this.getVal());
     }
 }

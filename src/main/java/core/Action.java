@@ -7,7 +7,6 @@ import core.interrupt.ReturnInterrupt;
 import grammar.X0BaseVisitor;
 import grammar.X0Parser;
 
-import javax.xml.crypto.Data;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -122,17 +121,6 @@ public class Action extends X0BaseVisitor {
         return ctx.getText();
     }
 
-    private class IdentDeclParsingResult {
-        IdentDeclParsingResult(String ident, List<Integer> dimensions) {
-            this.ident = ident;
-            this.dimensions = dimensions;
-        }
-
-        String ident;
-
-        List<Integer> dimensions;
-    }
-
     private void addDeclaredIdent(Map<String, DataType> map, String ident, DataType data) {
         if (map.containsKey(ident)) {
             throw new RuntimeException("Duplicated key: " + ident);
@@ -164,6 +152,11 @@ public class Action extends X0BaseVisitor {
 
     @Override
     public Map<String, DataType> visitDeclarationStat(X0Parser.DeclarationStatContext ctx) {
+        if (ctx.CONST() != null) {
+            Map<String, DataType> ret = new HashMap<>();
+            ctx.constDecl().forEach(t -> addConstDecl(ret, t));
+            return ret;
+        }
         int type = (Integer) this.visit(ctx.type());
         Class typeObj = null;
         if (type == X0Parser.INT || type == X0Parser.CHAR) {
@@ -214,6 +207,10 @@ public class Action extends X0BaseVisitor {
         if (data == null) {
             return globals.get(name);
         } return data;
+    }
+
+    private void addConstDecl(Map<String, DataType> map, X0Parser.ConstDeclContext ctx) {
+        addDeclaredIdent(map, visitIdent(ctx.ident()), (ElementaryType) visit(ctx.expression()));
     }
 
     @Override
@@ -362,7 +359,7 @@ public class Action extends X0BaseVisitor {
 
     @Override
     public ElementaryType visitFactorVariable(X0Parser.FactorVariableContext ctx) {
-        return (ElementaryType) visit(ctx.var());
+        return ((ElementaryType) visit(ctx.var())).clone();
     }
 
     @Override
@@ -466,6 +463,21 @@ public class Action extends X0BaseVisitor {
             throw new ReturnInterrupt();
         } else {
             throw new ReturnInterrupt((ElementaryType) visit(ctx.expression()));
+        }
+    }
+
+    @Override
+    public ElementaryType visitFactorCall(X0Parser.FactorCallContext ctx) {
+        return ((ElementaryType) super.visitFactorCall(ctx)).clone();
+    }
+
+    private class IdentDeclParsingResult {
+        String ident;
+        List<Integer> dimensions;
+
+        IdentDeclParsingResult(String ident, List<Integer> dimensions) {
+            this.ident = ident;
+            this.dimensions = dimensions;
         }
     }
 }

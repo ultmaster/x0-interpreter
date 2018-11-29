@@ -73,7 +73,7 @@ public class X0Float extends X0Number {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public X0Float clone() {
         return new X0Float(this.getVal());
     }
 }

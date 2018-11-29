@@ -85,7 +85,7 @@ public class X0Boolean extends X0Number {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public X0Boolean clone() {
         return new X0Boolean(this.getVal());
     }
 }

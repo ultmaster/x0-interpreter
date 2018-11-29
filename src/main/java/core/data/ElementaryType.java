@@ -28,4 +28,9 @@ public abstract class ElementaryType extends DataType {
     public String verboseInfo() {
         return "[ElementaryType]";
     }
+
+    @Override
+    public ElementaryType clone() {
+        return null;
+    }
 }

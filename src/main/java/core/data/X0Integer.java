@@ -69,6 +69,15 @@ public class X0Integer extends X0Number {
     }
 
     @Override
+    public X0Number xor(X0Number that) {
+        if (that instanceof X0Integer) {
+            return new X0Integer(getVal() ^ ((X0Integer) that).getVal());
+        } else {
+            return super.xor(that);
+        }
+    }
+
+    @Override
     public String verboseInfo() {
         return "[Integer] " + toString();
     }

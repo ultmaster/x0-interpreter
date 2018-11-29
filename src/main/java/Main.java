@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class Main {
 
-    public static final String inputExample = "./examples/example4.x";
+    public static final String inputExample = "./examples/example8.x";
 
     public static void main(String args[]) throws IOException {
         X0Lexer lexer = new X0Lexer(CharStreams.fromFileName(inputExample));

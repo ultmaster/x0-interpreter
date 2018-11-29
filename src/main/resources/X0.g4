@@ -65,12 +65,16 @@ statement
     | forStat
     | continueStat
     | breakStat
+    | exitStat
     | returnStat
+    | doWhileStat
+    | repeatUntilStat
     ;
 
 continueStat: CONTINUE ';';
 breakStat: BREAK ';';
 returnStat: RETURN expression? ';';
+exitStat: EXIT ';';
 
 ifStat
     : 'if' '(' expression ')' statement ('else' statement)?
@@ -82,6 +86,14 @@ whileStat
 
 forStat
     : 'for' '(' expression ';' expression ';' expression ')' statement
+    ;
+
+doWhileStat
+    : 'do' statement 'while' '(' expression ')' ';'
+    ;
+
+repeatUntilStat
+    : 'repeat' statement 'until' '(' expression ')' ';'
     ;
 
 writeStat
@@ -118,7 +130,7 @@ simpleExpr
 
 conditionTerm
     : conditionTerm AND conditionFactor           # conditionTermRecursive
-    | NOT? conditionFactor                        # conditionTermNot
+    | NOT? ODD? conditionFactor                   # conditionTermNot
     ;
 
 conditionFactor
@@ -132,8 +144,8 @@ additiveExpr
     ;
 
 term
-    : term op = (MUL | DIV | MOD) factor         # termRecursive
-    | factor                                     # termDefault
+    : term op = (MUL | DIV | MOD | XOR) factor         # termRecursive
+    | factor                                           # termDefault
     ;
 
 factor
@@ -170,10 +182,13 @@ TRUE: 'true';
 FALSE: 'false';
 CONTINUE: 'continue';
 BREAK: 'break';
+EXIT: 'exit';
 AND: 'and';
 OR: 'or';
 NOT: 'not';
+ODD: 'odd';
 FUNCTION: 'function';
+XOR: 'xor';
 REF: 'ref';
 ID_STRING: [a-zA-Z][a-zA-Z0-9]* ;
 NUM: [0-9]+;

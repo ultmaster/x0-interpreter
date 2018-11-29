@@ -87,6 +87,10 @@ public abstract class X0Number extends ElementaryType {
         }
     }
 
+    public X0Number xor(X0Number that) {
+        throw new RuntimeException("XOR operation not supported");
+    }
+
     @Override
     public String toString() {
         return String.valueOf(this.getVal());

@@ -3,6 +3,7 @@ package core;
 import core.data.*;
 import core.interrupt.BreakInterrupt;
 import core.interrupt.ContinueInterrupt;
+import core.interrupt.ExitInterrupt;
 import core.interrupt.ReturnInterrupt;
 import grammar.X0BaseVisitor;
 import grammar.X0Parser;
@@ -43,9 +44,13 @@ public class Action extends X0BaseVisitor {
         dataStack.push(new HashMap<>());
         visitProcedureList(ctx.procedureList());
         visitDeclarationList(ctx.declarationList(1));
-        Object ret = this.visit(ctx.statementList());
+        try {
+            this.visit(ctx.statementList());
+        } catch (ExitInterrupt e) {
+            System.err.println("Exit with 'exit' command");
+        }
         dataStack.pop();
-        return ret;
+        return null;
     }
 
     private ElementaryType callProcedure(String name, List<DataType> arguments) {
@@ -302,6 +307,13 @@ public class Action extends X0BaseVisitor {
     @Override
     public ElementaryType visitConditionTermNot(X0Parser.ConditionTermNotContext ctx) {
         ElementaryType ret = (ElementaryType) visit(ctx.conditionFactor());
+        if (ctx.ODD() != null) {
+            if (ret instanceof X0Integer) {
+                ret = new X0Boolean(((X0Integer) ret).getVal() % 2 != 0);
+            } else {
+                throw new RuntimeException("Odd operation not supported for non-integers.");
+            }
+        }
         if (ctx.NOT() != null) return ret.not();
         else return ret;
     }
@@ -348,6 +360,8 @@ public class Action extends X0BaseVisitor {
             return a.divide(b);
         } else if (ctx.op.getType() == X0Parser.MOD) {
             return a.mod(b);
+        } else if (ctx.op.getType() == X0Parser.XOR) {
+            return a.xor(b);
         }
         return null;
     }
@@ -471,6 +485,41 @@ public class Action extends X0BaseVisitor {
         return ((ElementaryType) super.visitFactorCall(ctx)).clone();
     }
 
+    @Override
+    public Object visitExitStat(X0Parser.ExitStatContext ctx) {
+        throw new ExitInterrupt();
+    }
+
+    @Override
+    public Object visitDoWhileStat(X0Parser.DoWhileStatContext ctx) {
+        while (true) {
+            try {
+                visit(ctx.statement());
+            } catch (ContinueInterrupt e) {
+            } catch (BreakInterrupt e) {
+                break;
+            }
+            ElementaryType cond = (ElementaryType) visit(ctx.expression());
+            if (cond.compareToZero() == 0) break;
+        }
+        return null;
+    }
+
+    @Override
+    public Object visitRepeatUntilStat(X0Parser.RepeatUntilStatContext ctx) {
+        while (true) {
+            try {
+                visit(ctx.statement());
+            } catch (ContinueInterrupt e) {
+            } catch (BreakInterrupt e) {
+                break;
+            }
+            ElementaryType cond = (ElementaryType) visit(ctx.expression());
+            if (cond.compareToZero() != 0) break;
+        }
+        return null;
+    }
+
     private class IdentDeclParsingResult {
         String ident;
         List<Integer> dimensions;
@@ -480,4 +529,5 @@ public class Action extends X0BaseVisitor {
             this.dimensions = dimensions;
         }
     }
+
 }

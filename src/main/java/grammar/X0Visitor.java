@@ -152,6 +152,12 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturnStat(X0Parser.ReturnStatContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link X0Parser#exitStat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExitStat(X0Parser.ExitStatContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link X0Parser#ifStat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -169,6 +175,18 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitForStat(X0Parser.ForStatContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#doWhileStat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDoWhileStat(X0Parser.DoWhileStatContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#repeatUntilStat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRepeatUntilStat(X0Parser.RepeatUntilStatContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link X0Parser#writeStat}.
 	 * @param ctx the parse tree

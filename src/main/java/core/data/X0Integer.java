@@ -68,4 +68,13 @@ public class X0Integer extends X0Number {
         return new X0Integer(that.getVal().longValue() % this.getVal());
     }
 
+    @Override
+    public String verboseInfo() {
+        return "[Integer] " + toString();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return new X0Integer(this.getVal());
+    }
 }

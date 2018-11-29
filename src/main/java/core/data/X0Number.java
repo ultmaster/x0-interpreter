@@ -91,4 +91,9 @@ public abstract class X0Number extends ElementaryType {
     public String toString() {
         return String.valueOf(this.getVal());
     }
+
+    @Override
+    public String verboseInfo() {
+        return "[Number]";
+    }
 }

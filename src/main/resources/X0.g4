@@ -1,7 +1,19 @@
 grammar X0;
 
 program
-    : 'main' '{' declarationList statementList '}'
+    : declarationList procedureList 'main' '{' declarationList statementList '}'
+    ;
+
+procedureList
+    : procedure*
+    ;
+
+procedure
+    : FUNCTION ident '(' (procedureArgument (',' procedureArgument)*)? ')' '{' declarationList statementList '}'
+    ;
+
+procedureArgument
+    : ident REF?
     ;
 
 declarationList
@@ -9,8 +21,17 @@ declarationList
     ;
 
 declarationStat
-    : type ident ';'                                # declElementary
-    | type ident '[' NUM (']' '[' NUM)* ']' ';'     # declArray
+    : type identDecl (',' identDecl)* ';'
+    | CONST constDecl (',' constDecl)* ';'
+    ;
+
+constDecl
+    : ident '=' expression
+    ;
+
+identDecl
+    : ident                                                 # identDeclElementary
+    | ident '[' expression (']' '[' expression)* ']'        # identDeclArray
     ;
 
 ident
@@ -44,10 +65,12 @@ statement
     | forStat
     | continueStat
     | breakStat
+    | returnStat
     ;
 
-continueStat: CONTINUE;
-breakStat: BREAK;
+continueStat: CONTINUE ';';
+breakStat: BREAK ';';
+returnStat: RETURN expression? ';';
 
 ifStat
     : 'if' '(' expression ')' statement ('else' statement)?
@@ -84,6 +107,10 @@ expression
     | simpleExpr                # exprSimpleWrapper
     ;
 
+callExpr
+    : ident '(' (expression (',' expression)* )? ')'
+    ;
+
 simpleExpr
     : simpleExpr OR conditionTerm                 # conditionExprRecursive
     | conditionTerm                               # conditionExprSimple
@@ -113,6 +140,7 @@ factor
     : '(' expression ')'        # factorRecursive
     | var                       # factorVariable
     | literal                   # factorLiteral
+    | callExpr                  # factorCall
     ;
 
 literal
@@ -131,6 +159,8 @@ DecimalFloatingPointLiteral
 fragment ExponentPart: [eE] (PLUS | MINUS)? NUM;
 
 COMMENT: '/*' .*? '*/' -> skip;
+CONST: 'const';
+RETURN: 'return';
 INT: 'int';
 CHAR: 'char';
 STR: 'str';
@@ -143,6 +173,8 @@ BREAK: 'break';
 AND: 'and';
 OR: 'or';
 NOT: 'not';
+FUNCTION: 'function';
+REF: 'ref';
 ID_STRING: [a-zA-Z][a-zA-Z0-9]* ;
 NUM: [0-9]+;
 PLUS: '+';

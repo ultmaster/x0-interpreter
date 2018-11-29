@@ -13,14 +13,15 @@ import java.io.IOException;
 
 public class Main {
 
-    public static final String inputExample = "./examples/example5.x";
+    public static final String inputExample = "./examples/example7.x";
 
     public static void main(String args[]) throws IOException {
         X0Lexer lexer = new X0Lexer(CharStreams.fromFileName(inputExample));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         X0Parser parser = new X0Parser(tokens);
         X0Parser.ProgramContext tree = parser.program();
-        X0Visitor visitor = new Action(parser);
+        Action visitor = new Action(parser);
+        visitor.setDebug(true);
         visitor.visit(tree);
     }
 }

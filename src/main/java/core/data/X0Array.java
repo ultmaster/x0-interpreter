@@ -34,4 +34,14 @@ public class X0Array<T extends ElementaryType> extends DataType {
     public T get(List<Integer> idx) {
         return data[getRealIndex(idx)];
     }
+
+    @Override
+    public String verboseInfo() {
+        return "[Array] size = " + dimensions.toString();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        throw new CloneNotSupportedException();
+    }
 }

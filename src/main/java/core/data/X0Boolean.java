@@ -78,4 +78,14 @@ public class X0Boolean extends X0Number {
         if (getVal() == 0) return "false";
         return "true";
     }
+
+    @Override
+    public String verboseInfo() {
+        return "[Boolean] " + toString();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return new X0Boolean(this.getVal());
+    }
 }

@@ -17,25 +17,55 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(X0Parser.ProgramContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link X0Parser#procedureList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcedureList(X0Parser.ProcedureListContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#procedure}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcedure(X0Parser.ProcedureContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#procedureArgument}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProcedureArgument(X0Parser.ProcedureArgumentContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link X0Parser#declarationList}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitDeclarationList(X0Parser.DeclarationListContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code declElementary}
-	 * labeled alternative in {@link X0Parser#declarationStat}.
+	 * Visit a parse tree produced by {@link X0Parser#declarationStat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeclElementary(X0Parser.DeclElementaryContext ctx);
+	T visitDeclarationStat(X0Parser.DeclarationStatContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code declArray}
-	 * labeled alternative in {@link X0Parser#declarationStat}.
+	 * Visit a parse tree produced by {@link X0Parser#constDecl}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDeclArray(X0Parser.DeclArrayContext ctx);
+	T visitConstDecl(X0Parser.ConstDeclContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code identDeclElementary}
+	 * labeled alternative in {@link X0Parser#identDecl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIdentDeclElementary(X0Parser.IdentDeclElementaryContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code identDeclArray}
+	 * labeled alternative in {@link X0Parser#identDecl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIdentDeclArray(X0Parser.IdentDeclArrayContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link X0Parser#ident}.
 	 * @param ctx the parse tree
@@ -116,6 +146,12 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBreakStat(X0Parser.BreakStatContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link X0Parser#returnStat}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitReturnStat(X0Parser.ReturnStatContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link X0Parser#ifStat}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -185,6 +221,12 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExprSimpleWrapper(X0Parser.ExprSimpleWrapperContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#callExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCallExpr(X0Parser.CallExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code conditionExprSimple}
 	 * labeled alternative in {@link X0Parser#simpleExpr}.
@@ -268,6 +310,13 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFactorLiteral(X0Parser.FactorLiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code factorCall}
+	 * labeled alternative in {@link X0Parser#factor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFactorCall(X0Parser.FactorCallContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code literalInteger}
 	 * labeled alternative in {@link X0Parser#literal}.

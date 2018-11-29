@@ -66,4 +66,14 @@ public class X0Float extends X0Number {
     protected X0Number _mod_reverse(X0Number that) {
         return _mod(that);
     }
+
+    @Override
+    public String verboseInfo() {
+        return "[Float] " + toString();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return new X0Float(this.getVal());
+    }
 }

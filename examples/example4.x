@@ -1,7 +1,7 @@
 main {
-    int phi[200]; int prime[200];
-    int vis[200];
-    int pSize; int d; int i; int j;
+    int phi[200], prime[200];
+    bool vis[200];
+    int pSize, d, i, j;
     phi[1] = 1;
     for (i = 2; i < 200; ++i) {
         if (not vis[i]) {

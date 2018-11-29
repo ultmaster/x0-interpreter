@@ -23,4 +23,9 @@ public abstract class ElementaryType extends DataType {
     public X0Boolean not() {
         return new X0Boolean(this.compareToZero() == 0);
     }
+
+    @Override
+    public String verboseInfo() {
+        return "[ElementaryType]";
+    }
 }

@@ -18,7 +18,7 @@ public class X0String extends ElementaryType {
     }
 
     @Override
-    public Object getVal() {
+    public String getVal() {
         return val;
     }
 
@@ -59,5 +59,15 @@ public class X0String extends ElementaryType {
     @Override
     public int compareToZero() {
         return val.isEmpty() ? 0 : 1;
+    }
+
+    @Override
+    public String verboseInfo() {
+        return "[String] " + toString();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return new X0String(this.getVal());
     }
 }

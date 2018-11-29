@@ -1,31 +1,95 @@
 package core;
 
 import core.data.*;
+import core.interrupt.BreakInterrupt;
+import core.interrupt.ContinueInterrupt;
+import core.interrupt.ReturnInterrupt;
 import grammar.X0BaseVisitor;
 import grammar.X0Parser;
 
+import javax.xml.crypto.Data;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Action extends X0BaseVisitor {
     private X0Parser parser;
     private Scanner cin;
     private Stack<Map<String, DataType>> dataStack;
-    private int loopControlFlag, exitFlag;
+    private Map<String, DataType> globals;
+    private Map<String, X0Parser.ProcedureContext> procedures;
+    private boolean debugFlag;
 
     public Action(X0Parser parser) {
         this.parser = parser;
         cin = new Scanner(System.in);
         dataStack = new Stack<>();
-        loopControlFlag = exitFlag = 0;
+        procedures = new HashMap<>();
+        debugFlag = false;
+    }
+
+    public void setDebug(boolean debug) {
+        debugFlag = debug;
+    }
+
+    @Override
+    public Object visitProcedureList(X0Parser.ProcedureListContext ctx) {
+        ctx.procedure().forEach(procedure -> procedures.put(visitIdent(procedure.ident()), procedure));
+        return null;
     }
 
     @Override
     public Object visitProgram(X0Parser.ProgramContext ctx) {
-        Map<String, DataType> currentLayer = visitDeclarationList(ctx.declarationList());
-        dataStack.push(currentLayer);
+        globals = new HashMap<>();
+        accumulateDeclarationList(ctx.declarationList(0), globals);
+        dataStack.push(new HashMap<>());
+        visitProcedureList(ctx.procedureList());
+        visitDeclarationList(ctx.declarationList(1));
         Object ret = this.visit(ctx.statementList());
         dataStack.pop();
         return ret;
+    }
+
+    private ElementaryType callProcedure(String name, List<DataType> arguments) {
+        X0Parser.ProcedureContext proc = procedures.get(name);
+        if (proc == null) {
+            throw new RuntimeException("Procedure '" + name + "' not found.");
+        }
+        // argument mapping
+        dataStack.push(new HashMap<>());
+
+        if (arguments.size() != proc.procedureArgument().size()) {
+            throw new RuntimeException(String.format("Procedure '%s' arguments: expected %d, found %d",
+                    name, proc.procedureArgument().size(), arguments.size()));
+        }
+        for (int i = 0; i < arguments.size(); ++i) {
+            DataType d = arguments.get(i);
+            if (proc.procedureArgument(i).REF() == null)
+                try {
+                    d = (DataType) d.clone();
+                } catch (CloneNotSupportedException e) {
+                    throw new RuntimeException("Procedure argument does not support clone here.");
+                }
+            addDeclaredIdent(dataStack.peek(), visitIdent(proc.procedureArgument(i).ident()), d);
+        }
+        visitDeclarationList(proc.declarationList());
+        try {
+            visitStatementList(proc.statementList());
+        } catch (ReturnInterrupt e) {
+            if (e.data != null) {
+                dataStack.pop();  // clean up
+                return e.data;
+            }
+        } catch (ContinueInterrupt | BreakInterrupt e) {
+            throw new RuntimeException("Loop structure not found for continue/break.");
+        }
+        dataStack.pop();
+        return new X0Boolean(false);
+    }
+
+    @Override
+    public Object visitCallExpr(X0Parser.CallExprContext ctx) {
+        List<DataType> arguments = ctx.expression().stream().map(exp -> (DataType) visit(exp)).collect(Collectors.toList());
+        return callProcedure(visitIdent(ctx.ident()), arguments);
     }
 
     @Override
@@ -58,60 +122,104 @@ public class Action extends X0BaseVisitor {
         return ctx.getText();
     }
 
+    private class IdentDeclParsingResult {
+        IdentDeclParsingResult(String ident, List<Integer> dimensions) {
+            this.ident = ident;
+            this.dimensions = dimensions;
+        }
+
+        String ident;
+
+        List<Integer> dimensions;
+    }
+
+    private void addDeclaredIdent(Map<String, DataType> map, String ident, DataType data) {
+        if (map.containsKey(ident)) {
+            throw new RuntimeException("Duplicated key: " + ident);
+        }
+        map.put(ident, data);
+    }
+
     @Override
-    public Map<String, DataType> visitDeclarationList(X0Parser.DeclarationListContext ctx) {
-        Map<String, DataType> cur = new HashMap<>();
+    public IdentDeclParsingResult visitIdentDeclArray(X0Parser.IdentDeclArrayContext ctx) {
+        String name = (String) this.visit(ctx.ident());
+        List<Integer> dimensions = new ArrayList<>();
+        for (X0Parser.ExpressionContext exp: ctx.expression()) {
+            ElementaryType t = (ElementaryType) visit(exp);
+            if (!(t instanceof X0Integer))
+                throw new RuntimeException("Array dimensions should be integers");
+            X0Integer tInt = (X0Integer) t;
+            if (tInt.getVal().intValue() <= 0)
+                throw new RuntimeException("Array dimensions should be greater than 0");
+            dimensions.add(tInt.getVal().intValue());
+        }
+        return new IdentDeclParsingResult(name, dimensions);
+    }
+
+    @Override
+    public IdentDeclParsingResult visitIdentDeclElementary(X0Parser.IdentDeclElementaryContext ctx) {
+        String name = (String) this.visit(ctx.ident());
+        return new IdentDeclParsingResult(name, null);
+    }
+
+    @Override
+    public Map<String, DataType> visitDeclarationStat(X0Parser.DeclarationStatContext ctx) {
+        int type = (Integer) this.visit(ctx.type());
+        Class typeObj = null;
+        if (type == X0Parser.INT || type == X0Parser.CHAR) {
+            typeObj = X0Integer.class;
+        } else if (type == X0Parser.BOOL) {
+            typeObj = X0Boolean.class;
+        } else if (type == X0Parser.FLOAT) {
+            typeObj = X0Float.class;
+        } else if (type == X0Parser.STR) {
+            typeObj = X0String.class;
+        }
+        assert typeObj != null;
+        Map<String, DataType> ret = new HashMap<>();
+        for (X0Parser.IdentDeclContext identDeclContext : ctx.identDecl()) {
+            IdentDeclParsingResult t = (IdentDeclParsingResult) visit(identDeclContext);
+            if (t.dimensions == null) {
+                try {
+                    DataType data = (DataType) typeObj.newInstance();
+                    addDeclaredIdent(ret, t.ident, data);
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                @SuppressWarnings("unchecked") DataType data = new X0Array<>(typeObj, t.dimensions);
+                addDeclaredIdent(ret, t.ident, data);
+            }
+        }
+        return ret;
+    }
+
+    private void accumulateDeclarationList(X0Parser.DeclarationListContext ctx, Map<String, DataType> cur) {
         for (X0Parser.DeclarationStatContext statContext : ctx.declarationStat()) {
-            DataType decl = (DataType) this.visit(statContext);
-            cur.put(decl.getIdent(), decl);
+            visitDeclarationStat(statContext).forEach((k, v) -> addDeclaredIdent(cur, k, v));
         }
-        return cur;
+        if (debugFlag) {
+            cur.forEach((key, val) -> System.err.println(key + "\t" + val.verboseInfo()));
+        }
     }
 
     @Override
-    public Object visitDeclArray(X0Parser.DeclArrayContext ctx) {
-        int type = (Integer) this.visit(ctx.type());
-        String name = (String) this.visit(ctx.ident());
-        DataType data = null;
-        ArrayList<Integer> dimensions = new ArrayList<>();
-        ctx.NUM().forEach(num -> dimensions.add(Integer.parseInt(num.getSymbol().getText())));
-        if (type == X0Parser.INT || type == X0Parser.CHAR) {
-            data = new X0Array<>(X0Integer.class, dimensions);
-        } else if (type == X0Parser.BOOL) {
-            data = new X0Array<>(X0Boolean.class, dimensions);
-        } else if (type == X0Parser.FLOAT) {
-            data = new X0Array<>(X0Float.class, dimensions);
-        } else if (type == X0Parser.STR) {
-            data = new X0Array<>(X0String.class, dimensions);
-        }
-        assert data != null;
-        data.setIdent(name);
-        return data;
+    public Object visitDeclarationList(X0Parser.DeclarationListContext ctx) {
+        accumulateDeclarationList(ctx, dataStack.peek());
+        return null;
     }
 
-    @Override
-    public DataType visitDeclElementary(X0Parser.DeclElementaryContext ctx) {
-        int type = (Integer) this.visit(ctx.type());
-        String name = (String) this.visit(ctx.ident());
-        DataType data = null;
-        if (type == X0Parser.INT || type == X0Parser.CHAR) {
-            data = new X0Integer();
-        } else if (type == X0Parser.BOOL) {
-            data = new X0Boolean();
-        } else if (type == X0Parser.FLOAT) {
-            data = new X0Float();
-        } else if (type == X0Parser.STR) {
-            data = new X0String();
-        }
-        assert data != null;
-        data.setIdent(name);
-        return data;
+    private DataType locateDataByName(String name) {
+        DataType data = dataStack.peek().get(name);
+        if (data == null) {
+            return globals.get(name);
+        } return data;
     }
 
     @Override
     public ElementaryType visitVarArray(X0Parser.VarArrayContext ctx) {
         String ident = this.visitIdent(ctx.ident());
-        DataType data = dataStack.peek().get(ident);
+        DataType data = locateDataByName(ident);
         if (data == null || ! (data instanceof X0Array)) {
             throw new RuntimeException("Unable to find '" + ident + "' as an elementary type variable");
         }
@@ -126,7 +234,7 @@ public class Action extends X0BaseVisitor {
     @Override
     public ElementaryType visitVarElementary(X0Parser.VarElementaryContext ctx) {
         String ident = this.visitIdent(ctx.ident());
-        DataType data = dataStack.peek().get(ident);
+        DataType data = locateDataByName(ident);
         if (data == null || ! (data instanceof ElementaryType)) {
             throw new RuntimeException("Unable to find '" + ident + "' as an elementary type variable");
         }
@@ -294,28 +402,17 @@ public class Action extends X0BaseVisitor {
         return null;
     }
 
-    private boolean testBreak() {
-        if (loopControlFlag == X0Parser.BREAK) {
-            loopControlFlag = 0;
-            return true;
-        } return false;
-    }
-
-    private boolean testContinue() {
-        if (loopControlFlag == X0Parser.CONTINUE) {
-            loopControlFlag = 0;
-            return true;
-        } return false;
-    }
-
     @Override
     public Object visitWhileStat(X0Parser.WhileStatContext ctx) {
         while (true) {
             ElementaryType cond = (ElementaryType) visit(ctx.expression());
             if (cond.compareToZero() != 0) {
-                visit(ctx.statement());
-                if (testBreak()) break;
-                testContinue();
+                try {
+                    visit(ctx.statement());
+                } catch (ContinueInterrupt e) {
+                } catch (BreakInterrupt e) {
+                    break;
+                }
             } else break;
         }
         return null;
@@ -327,9 +424,12 @@ public class Action extends X0BaseVisitor {
         while (true) {
             ElementaryType cond = (ElementaryType) visit(ctx.expression(1));
             if (cond.compareToZero() != 0) {
-                visit(ctx.statement());
-                if (testBreak()) break;
-                testContinue();
+                try {
+                    visit(ctx.statement());
+                } catch (ContinueInterrupt e) {
+                } catch (BreakInterrupt e) {
+                    break;
+                }
                 visit(ctx.expression(2));
             } else break;
         }
@@ -352,23 +452,20 @@ public class Action extends X0BaseVisitor {
 
     @Override
     public Object visitContinueStat(X0Parser.ContinueStatContext ctx) {
-        loopControlFlag = X0Parser.CONTINUE;
-        return null;
+        throw new ContinueInterrupt();
     }
 
     @Override
     public Object visitBreakStat(X0Parser.BreakStatContext ctx) {
-        loopControlFlag = X0Parser.BREAK;
-        return null;
+        throw new BreakInterrupt();
     }
 
     @Override
-    public Object visitStatementList(X0Parser.StatementListContext ctx) {
-        for (X0Parser.StatementContext statCtx: ctx.statement()) {
-            visit(statCtx);
-            if (loopControlFlag != 0)
-                return null;
+    public Object visitReturnStat(X0Parser.ReturnStatContext ctx) {
+        if (ctx.expression() == null) {
+            throw new ReturnInterrupt();
+        } else {
+            throw new ReturnInterrupt((ElementaryType) visit(ctx.expression()));
         }
-        return null;
     }
 }

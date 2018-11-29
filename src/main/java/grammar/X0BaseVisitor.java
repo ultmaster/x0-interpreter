@@ -24,6 +24,27 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitProcedureList(X0Parser.ProcedureListContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitProcedure(X0Parser.ProcedureContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitProcedureArgument(X0Parser.ProcedureArgumentContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitDeclarationList(X0Parser.DeclarationListContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -31,14 +52,28 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDeclElementary(X0Parser.DeclElementaryContext ctx) { return visitChildren(ctx); }
+	@Override public T visitDeclarationStat(X0Parser.DeclarationStatContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitDeclArray(X0Parser.DeclArrayContext ctx) { return visitChildren(ctx); }
+	@Override public T visitConstDecl(X0Parser.ConstDeclContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitIdentDeclElementary(X0Parser.IdentDeclElementaryContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitIdentDeclArray(X0Parser.IdentDeclArrayContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -129,6 +164,13 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitReturnStat(X0Parser.ReturnStatContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitIfStat(X0Parser.IfStatContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
@@ -200,6 +242,13 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitExprSimpleWrapper(X0Parser.ExprSimpleWrapperContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitCallExpr(X0Parser.CallExprContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -284,6 +333,13 @@ public class X0BaseVisitor<T> extends AbstractParseTreeVisitor<T> implements X0V
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitFactorLiteral(X0Parser.FactorLiteralContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitFactorCall(X0Parser.FactorCallContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

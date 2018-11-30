@@ -11,7 +11,7 @@ main {
             phi[i] = i - 1;
         }
         for (j = 0; j < pSize and (d = i * prime[j]) < pMax; ++j) {
-            vis[d] = 1;
+            vis[d] = true;
             if (i % prime[j] == 0) {
                 phi[d] = phi[i] * prime[j];
                 break;

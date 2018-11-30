@@ -1,5 +1,7 @@
 package core.data;
 
+import static java.lang.Math.abs;
+
 public class X0Integer extends X0Number {
     private Long val;
 
@@ -52,12 +54,19 @@ public class X0Integer extends X0Number {
         return new X0Integer(this.getVal() * that.getVal().longValue());
     }
 
+    private Long divide(Long a, Long b) {
+        if (b == 0) throw new RuntimeException("Divider cannot be zero!");
+        Long ret = abs(a) / abs(b);
+        if (a > 0 && b < 0 || a < 0 && b > 0) return -ret;
+        return ret;
+    }
+
     protected X0Number _divide(X0Number that) {
-        return new X0Integer(this.getVal() / that.getVal().longValue());
+        return new X0Integer(divide(this.getVal(), that.getVal().longValue()));
     }
 
     protected X0Number _divide_reverse(X0Number that) {
-        return new X0Integer(that.getVal().longValue() / this.getVal());
+        return new X0Integer(divide(that.getVal().longValue(), this.getVal()));
     }
 
     protected X0Number _mod(X0Number that) {

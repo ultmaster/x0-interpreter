@@ -17,8 +17,10 @@ public class ExampleTest {
     private List<Path> inputPath(String name) {
         try {
             return Files.list(new File("./examples/io/").toPath())
-                    .filter(path -> path.getFileName().toString().contains(name) &&
-                            path.getFileName().toString().endsWith(".in"))
+                    .filter(path -> {
+                        String fileName = path.getFileName().toString();
+                        return fileName.endsWith(".in") && (fileName.contains(name + "-") || fileName.contains(name + "."));
+                    })
                     .collect(Collectors.toList());
         } catch (IOException e) {
             return new ArrayList<>();

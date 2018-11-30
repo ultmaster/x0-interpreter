@@ -74,7 +74,7 @@ public class X0Float extends X0Number {
 
     @Override
     public String toString() {
-        return String.format("%.2f", getVal());
+        return String.format("%.6f", getVal());
     }
 
     @Override

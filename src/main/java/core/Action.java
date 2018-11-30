@@ -72,7 +72,7 @@ public class Action extends X0BaseVisitor {
                 try {
                     d = (DataType) d.clone();
                 } catch (CloneNotSupportedException e) {
-                    throw new RuntimeException("Procedure argument does not support clone here.");
+                    throw new RuntimeException("Procedure argument must be passed as 'call by value' here.");
                 }
             addDeclaredIdent(dataStack.peek(), visitIdent(proc.procedureArgument(i).ident()), d);
         }
@@ -235,13 +235,13 @@ public class Action extends X0BaseVisitor {
     }
 
     @Override
-    public ElementaryType visitVarElementary(X0Parser.VarElementaryContext ctx) {
+    public DataType visitVarElementary(X0Parser.VarElementaryContext ctx) {
         String ident = this.visitIdent(ctx.ident());
         DataType data = locateDataByName(ident);
-        if (data == null || ! (data instanceof ElementaryType)) {
-            throw new RuntimeException("Unable to find '" + ident + "' as an elementary type variable");
+        if (data == null) {
+            throw new RuntimeException("Unable to find '" + ident + "' as a variable");
         }
-        return (ElementaryType) data;
+        return data;
     }
 
     @Override

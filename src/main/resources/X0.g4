@@ -134,8 +134,12 @@ simpleExpr
     ;
 
 conditionTerm
-    : conditionTerm AND conditionFactor           # conditionTermRecursive
-    | NOT? ODD? conditionFactor                   # conditionTermNot
+    : conditionTerm AND conditionTermNot          # conditionTermRecursive
+    | conditionTermNot                            # conditionTermWrapper
+    ;
+
+conditionTermNot
+    : NOT? ODD? conditionFactor
     ;
 
 conditionFactor

@@ -266,12 +266,12 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitConditionExprRecursive(X0Parser.ConditionExprRecursiveContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code conditionTermNot}
+	 * Visit a parse tree produced by the {@code conditionTermWrapper}
 	 * labeled alternative in {@link X0Parser#conditionTerm}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitConditionTermNot(X0Parser.ConditionTermNotContext ctx);
+	T visitConditionTermWrapper(X0Parser.ConditionTermWrapperContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code conditionTermRecursive}
 	 * labeled alternative in {@link X0Parser#conditionTerm}.
@@ -279,6 +279,12 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitConditionTermRecursive(X0Parser.ConditionTermRecursiveContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link X0Parser#conditionTermNot}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditionTermNot(X0Parser.ConditionTermNotContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link X0Parser#conditionFactor}.
 	 * @param ctx the parse tree

@@ -11,7 +11,7 @@ import java.io.IOException;
 
 public class Main {
 
-    public static final String inputExample = "./examples/example14.x";
+    private static final String inputExample = "./examples/example16.x";
 
     public static void main(String args[]) {
         String input = inputExample;

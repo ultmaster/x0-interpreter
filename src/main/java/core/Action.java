@@ -322,7 +322,7 @@ public class Action extends X0BaseVisitor {
     @Override
     public ElementaryType visitConditionTermRecursive(X0Parser.ConditionTermRecursiveContext ctx) {
         ElementaryType a = (ElementaryType) visit(ctx.conditionTerm());
-        ElementaryType b = (ElementaryType) visit(ctx.conditionFactor());
+        ElementaryType b = (ElementaryType) visit(ctx.conditionTermNot());
         return a.and(b);
     }
 

@@ -4,5 +4,5 @@ function foo(a, b) {
 }
 
 main {
-    foo(1);
+    foo(1, 2);
 }

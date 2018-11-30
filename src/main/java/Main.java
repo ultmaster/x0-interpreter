@@ -11,18 +11,24 @@ import java.io.IOException;
 
 public class Main {
 
-    public static final String inputExample = "./examples/example8.x";
+    public static final String inputExample = "./examples/example6.x";
 
-    public static void main(String args[]) throws IOException {
-        X0Lexer lexer = new X0Lexer(CharStreams.fromFileName(inputExample));
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        X0Parser parser = new X0Parser(tokens);
-        X0Parser.ProgramContext tree = parser.program();
-        if (parser.getNumberOfSyntaxErrors() > 0) {
-            throw new RuntimeException("Parse failed!");
+    public static void main(String args[]) {
+        String input = inputExample;
+        if (args.length >= 1) input = args[0];
+        X0Lexer lexer = null;
+        try {
+            lexer = new X0Lexer(CharStreams.fromFileName(input));
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            X0Parser parser = new X0Parser(tokens);
+            X0Parser.ProgramContext tree = parser.program();
+            if (parser.getNumberOfSyntaxErrors() > 0) {
+                throw new RuntimeException("Parse failed!");
+            }
+            Action visitor = new Action(parser);
+            visitor.visit(tree);
+        } catch (IOException e) {
+            throw new RuntimeException("File input not found");
         }
-        Action visitor = new Action(parser);
-        visitor.setDebug(true);
-        visitor.visit(tree);
     }
 }

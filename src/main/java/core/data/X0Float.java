@@ -73,6 +73,11 @@ public class X0Float extends X0Number {
     }
 
     @Override
+    public String toString() {
+        return String.format("%.2f", getVal());
+    }
+
+    @Override
     public X0Float clone() {
         return new X0Float(this.getVal());
     }

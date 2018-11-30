@@ -10,5 +10,6 @@ main {
     x = 84; y = 63;
     write x + " " + y;
     write gcd(x, y, z);
+    write x + " " + y;
     write "LCM = " + x / z * y;
 }

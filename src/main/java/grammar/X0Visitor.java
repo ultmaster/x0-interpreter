@@ -246,6 +246,12 @@ public interface X0Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCallExpr(X0Parser.CallExprContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link X0Parser#callArgument}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCallArgument(X0Parser.CallArgumentContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code conditionExprSimple}
 	 * labeled alternative in {@link X0Parser#simpleExpr}.
 	 * @param ctx the parse tree

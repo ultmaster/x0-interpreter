@@ -120,7 +120,12 @@ expression
     ;
 
 callExpr
-    : ident '(' (expression (',' expression)* )? ')'
+    : ident '(' (callArgument (',' callArgument)* )? ')'
+    ;
+
+callArgument
+    : var
+    | expression
     ;
 
 simpleExpr

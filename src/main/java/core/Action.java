@@ -47,7 +47,8 @@ public class Action extends X0BaseVisitor {
         try {
             this.visit(ctx.statementList());
         } catch (ExitInterrupt e) {
-            System.err.println("Exit with 'exit' command");
+            if (debugFlag)
+                System.err.println("Exit with 'exit' command");
         }
         dataStack.pop();
         return null;
@@ -92,7 +93,7 @@ public class Action extends X0BaseVisitor {
 
     @Override
     public Object visitCallExpr(X0Parser.CallExprContext ctx) {
-        List<DataType> arguments = ctx.expression().stream().map(exp -> (DataType) visit(exp)).collect(Collectors.toList());
+        List<DataType> arguments = ctx.callArgument().stream().map(exp -> (DataType) visit(exp)).collect(Collectors.toList());
         return callProcedure(visitIdent(ctx.ident()), arguments);
     }
 

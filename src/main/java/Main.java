@@ -11,11 +11,13 @@ import java.io.IOException;
 
 public class Main {
 
-    private static final String inputExample = "./examples/rte8.x";
-
     public static void main(String args[]) {
-        String input = inputExample;
+        String input;
         if (args.length >= 1) input = args[0];
+        else {
+            System.err.println("Filename must be supplied.");
+            return;
+        }
         X0Lexer lexer = null;
         try {
             lexer = new X0Lexer(CharStreams.fromFileName(input));

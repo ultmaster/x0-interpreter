@@ -98,6 +98,7 @@ repeatUntilStat
 
 writeStat
     : 'write' expression ';'
+    | 'write' CHR expression ';'
     ;
 
 readStat
@@ -180,6 +181,7 @@ DecimalFloatingPointLiteral
 fragment ExponentPart: [eE] (PLUS | MINUS)? NUM;
 
 COMMENT: '/*' .*? '*/' -> skip;
+CHR: 'chr';
 CONST: 'const';
 RETURN: 'return';
 INT: 'int';

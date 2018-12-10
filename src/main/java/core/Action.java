@@ -246,7 +246,9 @@ public class Action extends X0BaseVisitor {
 
     @Override
     public Object visitWriteStat(X0Parser.WriteStatContext ctx) {
-        System.out.println(this.visit(ctx.expression()).toString());
+        ElementaryType d = (ElementaryType) this.visit(ctx.expression());
+        if (ctx.CHR() != null) System.out.println((char) ((Long) d.getVal()).longValue());
+        else System.out.println(d.toString());
         return null;
     }
 

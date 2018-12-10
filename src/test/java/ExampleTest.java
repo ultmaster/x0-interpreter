@@ -61,6 +61,8 @@ public class ExampleTest {
     @Test public void example14() { exampleTest(name.getMethodName()); }
     @Test public void example15() { exampleTest(name.getMethodName()); }
     @Test public void example16() { exampleTest(name.getMethodName()); }
+    @Test public void example17() { exampleTest(name.getMethodName()); }
+
 
     @Test(expected = RuntimeException.class)
     public void rte1() { exampleTest(name.getMethodName()); }
